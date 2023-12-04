@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GameMania.DataAcccessLayer.Infrastructure;
 using GameMania.DataAcccessLayer.Repository;
+using StackExchange.Redis;
 
 namespace GameMania.DataAcccessLayer
 {
@@ -18,7 +19,14 @@ namespace GameMania.DataAcccessLayer
         {
             services.AddDbContext<GameManiaContext>(options => 
             options.UseSqlServer(configuration.GetConnectionString("LocalDBConnectionStrings")));
+            services.AddSingleton<IDatabase>(confg =>
+            {
+                IConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnectionString"));
+                return multiplexer.GetDatabase();
+            });
+            services.AddScoped<ICacheService, CacheService>();
             services.AddScoped<IBoardGameRepository, BoardGamesRepository>();
+            
             return services;
         }
     }

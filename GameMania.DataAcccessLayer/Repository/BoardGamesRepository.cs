@@ -2,6 +2,7 @@
 using GameMania.DataAcccessLayer.Models;
 using GameMania.DataAcccessLayer.Repository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +13,10 @@ namespace GameMania.DataAcccessLayer.Repository
 {
     public class BoardGamesRepository : RepositoryBase, IBoardGameRepository
     {
-        public BoardGamesRepository(GameManiaContext gameManiaContext) : base(gameManiaContext)
+        private ICacheService _cacheService;
+        public BoardGamesRepository(GameManiaContext gameManiaContext,ICacheService cacheService) : base(gameManiaContext)
         {
+            _cacheService = cacheService;
         }
 
         public async Task<List<BoardGame>> GetBoardGamesBasedOnAge(int age)
@@ -33,6 +36,32 @@ namespace GameMania.DataAcccessLayer.Repository
                 return null;
             }
             
+        }
+
+        public async Task<List<BoardGame>> GetAllBoardGames()
+        {
+            try
+            {
+                var cacheData = _cacheService.GetData<IEnumerable<BoardGame>>("BoardGames");
+
+                if (cacheData != null)
+                {
+                    return (List<BoardGame>)cacheData;
+                }
+                var queryResult = (from BoardGames in _gameManiacontext.BoardGames
+                              select BoardGames).ToList();
+                if (queryResult != null)
+                {
+                    bool isSet = _cacheService.SetData("BoardGames", queryResult, DateTimeOffset.Now.AddMinutes(5.0));
+                    return queryResult;
+                }
+               
+                return null;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
     }
 }

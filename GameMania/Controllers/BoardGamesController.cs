@@ -1,4 +1,5 @@
 ﻿using GameMania.DataAcccessLayer.Infrastructure;
+using GameMania.DataAcccessLayer.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,8 +10,10 @@ namespace GameMania.Controllers
     public class BoardGamesController : ControllerBase
     {
         IBoardGameRepository _boardGamesRepository;
-        public BoardGamesController(IBoardGameRepository boardGamesRepository) {
+        ICacheService _cacheService;
+        public BoardGamesController(IBoardGameRepository boardGamesRepository,ICacheService cacheService) {
             _boardGamesRepository = boardGamesRepository;
+            _cacheService = cacheService;
         }
 
         [ActionName("Suggestions/BasedOnAge")]
@@ -19,6 +22,27 @@ namespace GameMania.Controllers
         {
             var queryResult = _boardGamesRepository.GetBoardGamesBasedOnAge(age);
             return Ok(queryResult);
+        }
+
+        [ActionName("GetAll")]
+        [HttpGet]
+        public async Task<IActionResult> GetAllBoardGames()
+        {
+            try
+            {
+                var queryResult = _boardGamesRepository.GetAllBoardGames();
+                if(queryResult != null)
+                {
+                    return Ok(queryResult);
+                }           
+                return Ok("Data Not Found");
+            }
+            catch (Exception)
+            {
+
+                return StatusCode(500);
+            }
+            
         }
     }
 }
