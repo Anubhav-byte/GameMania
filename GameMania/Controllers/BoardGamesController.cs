@@ -30,7 +30,7 @@ namespace GameMania.Controllers
         {
             try
             {
-                var queryResult = _boardGamesRepository.GetAllBoardGames();
+                var queryResult = await _boardGamesRepository.GetAllBoardGames();
                 if(queryResult != null)
                 {
                     return Ok(queryResult);

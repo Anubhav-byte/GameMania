@@ -26,11 +26,11 @@ namespace GameMania.DataAcccessLayer.Repository
                 var value = _cacheDatabase.StringGet(key);
                 if (!String.IsNullOrEmpty(value))
                 {
-                    Console.WriteLine();
-                    var jsonResult = JObject.Parse(value);
-                    var jsonBoardGames = jsonResult["Result"];
+                    //Console.WriteLine();
+                    //var jsonResult = JObject.Parse(value);
+                    //var jsonBoardGames = jsonResult["Result"];
 
-                    return JsonConvert.DeserializeObject<T>(jsonBoardGames.ToString());
+                    return JsonConvert.DeserializeObject<T>(value);
                 }
                 return default;
             }

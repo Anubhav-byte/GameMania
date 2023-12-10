@@ -10,6 +10,6 @@ namespace GameMania.DataAcccessLayer.Infrastructure
     public interface IBoardGameRepository
     {
        Task<List<BoardGame>> GetBoardGamesBasedOnAge(int age);
-       Task<List<BoardGame>> GetAllBoardGames();
+       Task<IEnumerable<BoardGame>> GetAllBoardGames();
     }
 }
